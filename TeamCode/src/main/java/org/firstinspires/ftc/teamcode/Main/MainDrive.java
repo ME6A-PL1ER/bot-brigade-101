@@ -18,6 +18,9 @@ public class MainDrive extends LinearOpMode {
 
     private boolean isHalfSpeedMode = false;
 
+    double xOffset = 0.089;
+    double yOffset = -0.0508;
+
     @Override
     public void runOpMode() throws InterruptedException {
         leftDrive = hardwareMap.dcMotor.get("leftDrive");
@@ -28,7 +31,7 @@ public class MainDrive extends LinearOpMode {
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+                RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
         imu.initialize(parameters);
 
         waitForStart();
@@ -55,8 +58,8 @@ public class MainDrive extends LinearOpMode {
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - fieldOffset;
             double headingRad = Math.toRadians(botHeading);
 
-            double tempX = x * Math.cos(headingRad) + y * Math.sin(headingRad);
-            double tempY = -x * Math.sin(headingRad) + y * Math.cos(headingRad);
+            double tempX = (x * Math.cos(headingRad) + y * Math.sin(headingRad)) - xOffset;
+            double tempY = (-x * Math.sin(headingRad) + y * Math.cos(headingRad)) - yOffset;
 
             double speedMultiplier = isHalfSpeedMode ? 0.3 : 1.0;
 
@@ -73,6 +76,7 @@ public class MainDrive extends LinearOpMode {
             telemetry.addData("Speed Mode", isHalfSpeedMode ? "Half-Speed" : "Full-Speed");
             telemetry.addData("Left Power", leftPower);
             telemetry.addData("Right Power", rightPower);
+            telemetry.addData("IMU Yaw", botHeading);
             telemetry.update();
         }
     }

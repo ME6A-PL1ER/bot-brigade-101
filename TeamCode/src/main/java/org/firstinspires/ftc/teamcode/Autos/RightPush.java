@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Autonomous
 public class RightPush extends LinearOpMode {
-    // Declare variables
     private DcMotor leftDrive;
     private DcMotor rightDrive;
 
