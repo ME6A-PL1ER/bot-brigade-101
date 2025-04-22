@@ -11,6 +11,7 @@ public class TestMotors extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         DcMotor leftDrive = hardwareMap.dcMotor.get("leftDrive");
         DcMotor rightDrive = hardwareMap.dcMotor.get("rightDrive");
+        DcMotor arm = hardwareMap.dcMotor.get("arm");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -20,6 +21,7 @@ public class TestMotors extends LinearOpMode {
         while (opModeIsActive()) {
             leftDrive.setPower(-gamepad1.left_stick_y);
             rightDrive.setPower(gamepad1.right_stick_y);
+            arm.setPower(gamepad1.left_stick_x);
         }
     }
 }

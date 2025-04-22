@@ -9,14 +9,14 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.AutoSubsystem;
 
 
-@Autonomous(name = "Left push with voltage compensation", group = "autos")
-public class LeftYellowPushCompensation extends LinearOpMode {
+@Autonomous(name = "Just drive forward", group = "autos")
+public class JustDriveForward extends LinearOpMode {
     private DcMotor leftDrive;
     private DcMotor rightDrive;
     private VoltageSensor batteryVoltageSensor;
     private IMU imu;
     private double fieldOffset = 0;
-    
+
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor leftDrive = hardwareMap.dcMotor.get("leftDrive");
@@ -46,28 +46,7 @@ public class LeftYellowPushCompensation extends LinearOpMode {
             (Instead of the circle being drawn clockwise its counterclockwise)
          */
 
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 750);
-
-        autoSubsystem.rotateToAngle(-45, 0.5);
-
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 150);
-
-        autoSubsystem.rotateToAngle(-165, 0.5);
-
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 600);
-
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 600);
-
-        autoSubsystem.rotateToAngle(-90, 0.5);
-
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 250);
-
-        autoSubsystem.rotateToAngle(-172, 0.5);
-
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 300);
-
-        autoSubsystem.rotateToAngle(103, 0.5);
-
-        autoSubsystem.move(leftDrive, rightDrive, 1, 3000);
+        autoSubsystem.move(leftDrive, rightDrive, 0.5, 2000);
+        return;
     }
 }
