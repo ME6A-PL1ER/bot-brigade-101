@@ -3,20 +3,18 @@ package org.firstinspires.ftc.teamcode.Main;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.Subsystems.ArmSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.AmpMonitor;
 
 @TeleOp(name = "Tank Drive", group = "Drive")
 public class MainDrive extends LinearOpMode {
-
-    double armTarget;
 
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor leftDrive = hardwareMap.dcMotor.get("leftDrive");
         DcMotor rightDrive = hardwareMap.dcMotor.get("rightDrive");
-        DcMotor arm = hardwareMap.dcMotor.get("arm");
+        final DcMotorEx arm = hardwareMap.get(DcMotorEx.class, "arm");
 
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -25,20 +23,22 @@ public class MainDrive extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        AmpMonitor ampMonitor = new AmpMonitor(arm);
+
         waitForStart();
 
         while (opModeIsActive()) {
 
             double forward = -gamepad1.left_stick_y;
             double turn = gamepad1.right_stick_x;
+            double aF = gamepad1.right_trigger;
+            double aR = gamepad1.left_trigger * -1;
 
             double leftPower = turn + forward;
             double rightPower = turn - forward;
+            double armPower = aF + aR;
 
-            if (gamepad1.dpad_up) {arm.setPower(0.7);}
-            else if (gamepad1.dpad_down) {arm.setPower(-0.7);}
-            else {arm.setPower(0);}
-
+            arm.setPower(armPower);
             leftDrive.setPower(leftPower);
             rightDrive.setPower(rightPower);
 

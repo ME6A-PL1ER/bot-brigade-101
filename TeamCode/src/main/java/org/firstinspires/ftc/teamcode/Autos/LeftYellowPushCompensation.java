@@ -85,13 +85,13 @@ public class LeftYellowPushCompensation extends LinearOpMode {
             error = targetAngle - currentAngle;
             error = ((error + 180) % 360 + 360) % 360 - 180;
 
-            boolean turnRight = error > 0;
+            boolean turnRight = error > 1.25;
 
-            if (Math.abs(error) <= 3) {
+            if (Math.abs(error) <= 2.5) {
                 break;
             }
 
-            turnPower = 0.8 * (Math.abs(error) / 45.0);
+            turnPower = 0.6 * (Math.abs(error) / 45.0);
             turnPower = Math.max(0.1, turnPower);
 
             if (turnRight) {
