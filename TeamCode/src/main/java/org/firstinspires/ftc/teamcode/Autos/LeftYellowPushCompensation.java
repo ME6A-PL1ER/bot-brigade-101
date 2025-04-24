@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Subsystems.AutoSubsystem;
 
 
@@ -16,7 +18,7 @@ public class LeftYellowPushCompensation extends LinearOpMode {
     private VoltageSensor batteryVoltageSensor;
     private IMU imu;
     private double fieldOffset = 0;
-    
+
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor leftDrive = hardwareMap.dcMotor.get("leftDrive");
@@ -48,26 +50,63 @@ public class LeftYellowPushCompensation extends LinearOpMode {
 
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 750);
 
-        autoSubsystem.rotateToAngle(-45, 0.5);
+        rotateToAngle(leftDrive, rightDrive, -45);
 
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 150);
 
-        autoSubsystem.rotateToAngle(-165, 0.5);
+        rotateToAngle(leftDrive, rightDrive, -165);
 
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 600);
 
         autoSubsystem.move(leftDrive, rightDrive, -0.5, 600);
 
-        autoSubsystem.rotateToAngle(-90, 0.5);
+        rotateToAngle(leftDrive, rightDrive, -90);
 
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 250);
 
-        autoSubsystem.rotateToAngle(-172, 0.5);
+        rotateToAngle(leftDrive, rightDrive, -172);
 
         autoSubsystem.move(leftDrive, rightDrive, -0.5, 300);
 
-        autoSubsystem.rotateToAngle(103, 0.5);
+        rotateToAngle(leftDrive, rightDrive, 103);
 
         autoSubsystem.move(leftDrive, rightDrive, 1, 3000);
+    }
+
+    private void rotateToAngle(DcMotor leftDrive, DcMotor rightDrive, double targetAngle) {
+        imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        double currentAngle;
+        double turnPower;
+        double error;
+
+        while (opModeIsActive()) {
+            currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - fieldOffset;
+
+            error = targetAngle - currentAngle;
+            error = ((error + 180) % 360 + 360) % 360 - 180;
+
+            boolean turnRight = error > 0;
+
+            if (Math.abs(error) <= 3) {
+                break;
+            }
+
+            turnPower = 0.8 * (Math.abs(error) / 45.0);
+            turnPower = Math.max(0.1, turnPower);
+
+            if (turnRight) {
+                leftDrive.setPower(turnPower);
+                rightDrive.setPower(turnPower);
+            } else {
+                leftDrive.setPower(-turnPower);
+                rightDrive.setPower(-turnPower);
+            }
+
+            telemetry.addData("Current Angle", currentAngle);
+            telemetry.addData("Target Angle", targetAngle);
+            telemetry.addData("Error", error);
+            telemetry.addData("Turning Right?", turnRight);
+            telemetry.update();
+        }
     }
 }

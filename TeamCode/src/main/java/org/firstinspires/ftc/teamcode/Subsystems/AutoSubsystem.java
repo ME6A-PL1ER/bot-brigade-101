@@ -54,19 +54,18 @@ public class AutoSubsystem extends SubsystemBase {
     }
 
     public void rotateToAngle(double targetAngle, double power) {
-        double currentAngle = normalizeAngle(getCurrentHeading());
+        double currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         double error = targetAngle - currentAngle;
         double fixedError = Math.abs(error);
-        while (fixedError > 1) {
+        while (fixedError > 3) {
             error = ((error + 180) % 360 + 360) % 360 - 180;
             fixedError = Math.abs(error);
             double turnPower = 0.65 * (Math.abs(error) / 45.0);
-            turnPower = Math.max(0.1, turnPower);
 
-            if (error > 1) {
+            if (error > 5) {
                 leftDrive.setPower(turnPower);
                 rightDrive.setPower(turnPower);
-            } else if (error < 1) {
+            } else if (error < 5) {
                 leftDrive.setPower(-turnPower);
                 rightDrive.setPower(-turnPower);
             }
