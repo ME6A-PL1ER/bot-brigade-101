@@ -25,9 +25,6 @@ public class AmpMonitor {
 
     public boolean ampTooHigh(double warningThreshold) {
         double currentAmperage = getCurrentAmperage();
-        if (currentAmperage > warningThreshold) {
-            return true;
-        }
-        return false;
+        return currentAmperage > warningThreshold;
     }
 }

@@ -29,7 +29,7 @@ public class LeftYellowPushCompensation extends LinearOpMode {
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
         imu.initialize(parameters);
 
         batteryVoltageSensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
@@ -78,35 +78,33 @@ public class LeftYellowPushCompensation extends LinearOpMode {
         double currentAngle;
         double turnPower;
         double error;
+        double absError;
 
         while (opModeIsActive()) {
-            currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - fieldOffset;
+            currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
             error = targetAngle - currentAngle;
             error = ((error + 180) % 360 + 360) % 360 - 180;
+            absError = Math.abs(error);
 
-            boolean turnRight = error > 1.25;
-
-            if (Math.abs(error) <= 2.5) {
+            if (absError < 2) {
                 break;
             }
 
-            turnPower = 0.6 * (Math.abs(error) / 45.0);
+            turnPower = 0.65 * (absError / 45.0);
             turnPower = Math.max(0.1, turnPower);
 
-            if (turnRight) {
+            if (error > 0) {
                 leftDrive.setPower(turnPower);
                 rightDrive.setPower(turnPower);
-            } else {
-                leftDrive.setPower(-turnPower);
-                rightDrive.setPower(-turnPower);
             }
 
             telemetry.addData("Current Angle", currentAngle);
             telemetry.addData("Target Angle", targetAngle);
             telemetry.addData("Error", error);
-            telemetry.addData("Turning Right?", turnRight);
             telemetry.update();
         }
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
     }
 }
