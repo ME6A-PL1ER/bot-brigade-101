@@ -52,9 +52,7 @@ public class LeftYellowPushCompensation extends LinearOpMode {
             (Instead of the circle being drawn clockwise its counterclockwise)
          */
 
-        sleep(3000);
-
-        armSubsystem.setPosition(1500);
+        armSubsystem.autoArmMover(1500);
     }
 
     public void rotateToAngle(DcMotor leftDrive, DcMotor rightDrive, double targetAngle) {

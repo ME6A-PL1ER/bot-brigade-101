@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
@@ -63,6 +65,8 @@ public class ArmSubsystem extends SubsystemBase {
         setPosition(autoTargetArmPosition);
         while (Math.abs(autoTargetArmPosition - getArmPosition()) > 25){
             update();
+            telemetry.addData("error", getArmError());
+            telemetry.update();
         }
         arm.set(0);
     }
