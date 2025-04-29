@@ -4,11 +4,14 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.SerialNumber;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Subsystems.AutoSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.ArmSubsystem;
 
 
 @Autonomous(name = "Left push with voltage compensation", group = "autos")
@@ -35,6 +38,7 @@ public class LeftYellowPushCompensation extends LinearOpMode {
         batteryVoltageSensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
 
         AutoSubsystem autoSubsystem = new AutoSubsystem(hardwareMap);
+        ArmSubsystem armSubsystem = new ArmSubsystem(hardwareMap);
 
         telemetry.addData("Status", "Initialized. Waiting for start...");
         telemetry.update();
@@ -48,33 +52,13 @@ public class LeftYellowPushCompensation extends LinearOpMode {
             (Instead of the circle being drawn clockwise its counterclockwise)
          */
 
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 750);
+        sleep(3000);
 
-        rotateToAngle(-45);
-
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 150);
-
-        rotateToAngle(-165);
-
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 600);
-
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 600);
-
-        rotateToAngle(-90);
-
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 250);
-
-        rotateToAngle(-172);
-
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 300);
-
-        rotateToAngle(103);
-
-        autoSubsystem.move(leftDrive, rightDrive, 1, 3000);
+        armSubsystem.setPosition(1500);
     }
 
-    public void rotateToAngle(double targetAngle) {
-        double kP = 0.01;  // Adjusts speed
+    public void rotateToAngle(DcMotor leftDrive, DcMotor rightDrive, double targetAngle) {
+        double kP = 0.1;  // Adjusts speed
         double kI = 0; // Don't touch it #1
         double kD = 0;  // Don't touch it #2
 
@@ -99,10 +83,14 @@ public class LeftYellowPushCompensation extends LinearOpMode {
 
             power = (kP * error) + (kI * integral) + (kD * derivative);
 
-            leftDrive.setPower(power);
-            rightDrive.setPower(power);
+            leftDrive.setPower(-power);
+            rightDrive.setPower(-power);
 
             lastError = error;
+
+            telemetry.addData("current angle", currentAngle);
+            telemetry.addData("target angle", targetAngle);
+            telemetry.addData("error", error);
 
             if (Math.abs(error) < 1) {
                 leftDrive.setPower(0);
