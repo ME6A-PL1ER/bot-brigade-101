@@ -50,61 +50,65 @@ public class LeftYellowPushCompensation extends LinearOpMode {
 
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 750);
 
-        rotateToAngle(leftDrive, rightDrive, -45);
+        rotateToAngle(-45);
 
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 150);
 
-        rotateToAngle(leftDrive, rightDrive, -165);
+        rotateToAngle(-165);
 
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 600);
 
         autoSubsystem.move(leftDrive, rightDrive, -0.5, 600);
 
-        rotateToAngle(leftDrive, rightDrive, -90);
+        rotateToAngle(-90);
 
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 250);
 
-        rotateToAngle(leftDrive, rightDrive, -172);
+        rotateToAngle(-172);
 
         autoSubsystem.move(leftDrive, rightDrive, -0.5, 300);
 
-        rotateToAngle(leftDrive, rightDrive, 103);
+        rotateToAngle(103);
 
         autoSubsystem.move(leftDrive, rightDrive, 1, 3000);
     }
 
-    private void rotateToAngle(DcMotor leftDrive, DcMotor rightDrive, double targetAngle) {
-        imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        double currentAngle;
-        double turnPower;
+    public void rotateToAngle(double targetAngle) {
+        double kP = 0.01;  // Adjusts speed
+        double kI = 0; // Don't touch it #1
+        double kD = 0;  // Don't touch it #2
+
         double error;
-        double absError;
+        double lastError = 0;
+        double integral = 0;
+        double derivative;
+        double power;
 
         while (opModeIsActive()) {
-            currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
+            double currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
             error = targetAngle - currentAngle;
-            error = ((error + 180) % 360 + 360) % 360 - 180;
-            absError = Math.abs(error);
 
-            if (absError < 2) {
+            if (error > 180) {
+                error -= 360;
+            } else if (error < -180) {
+                error += 360;
+            }
+
+            integral += error;
+            derivative = error - lastError;
+
+            power = (kP * error) + (kI * integral) + (kD * derivative);
+
+            leftDrive.setPower(power);
+            rightDrive.setPower(power);
+
+            lastError = error;
+
+            if (Math.abs(error) < 1) {
+                leftDrive.setPower(0);
+                rightDrive.setPower(0);
                 break;
             }
-
-            turnPower = 0.65 * (absError / 45.0);
-            turnPower = Math.max(0.1, turnPower);
-
-            if (error > 0) {
-                leftDrive.setPower(turnPower);
-                rightDrive.setPower(turnPower);
-            }
-
-            telemetry.addData("Current Angle", currentAngle);
-            telemetry.addData("Target Angle", targetAngle);
-            telemetry.addData("Error", error);
-            telemetry.update();
         }
-        leftDrive.setPower(0);
-        rightDrive.setPower(0);
     }
 }
