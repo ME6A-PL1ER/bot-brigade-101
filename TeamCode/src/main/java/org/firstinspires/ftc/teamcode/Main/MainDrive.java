@@ -39,7 +39,7 @@ public class MainDrive extends LinearOpMode {
         while (opModeIsActive()) {
 
             double forward = -gamepad1.left_stick_y;
-            double turn = gamepad1.right_stick_x;
+            double turn = gamepad1.right_stick_x * 0.6;
             double aF = gamepad1.right_trigger;
             double aR = gamepad1.left_trigger * -1;
 

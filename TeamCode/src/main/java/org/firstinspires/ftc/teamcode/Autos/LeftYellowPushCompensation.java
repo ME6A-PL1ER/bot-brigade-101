@@ -6,21 +6,26 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.SerialNumber;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Subsystems.AutoSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.ClawSubsystem;
 
 
-@Autonomous(name = "Left push with voltage compensation", group = "autos")
+@Autonomous(name = "specimine", group = "autos")
 public class LeftYellowPushCompensation extends LinearOpMode {
     private DcMotor leftDrive;
     private DcMotor rightDrive;
     private VoltageSensor batteryVoltageSensor;
     private IMU imu;
     private double fieldOffset = 0;
+    private boolean timerStarted;
+    ElapsedTime stabilityTimer = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -28,6 +33,8 @@ public class LeftYellowPushCompensation extends LinearOpMode {
         DcMotor rightDrive = hardwareMap.dcMotor.get("rightDrive");
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        Servo servo = hardwareMap.get(Servo.class, "servo");
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -39,6 +46,7 @@ public class LeftYellowPushCompensation extends LinearOpMode {
 
         AutoSubsystem autoSubsystem = new AutoSubsystem(hardwareMap);
         ArmSubsystem armSubsystem = new ArmSubsystem(hardwareMap);
+        ClawSubsystem clawSubsystem = new ClawSubsystem(servo);
 
         telemetry.addData("Status", "Initialized. Waiting for start...");
         telemetry.update();
@@ -52,11 +60,31 @@ public class LeftYellowPushCompensation extends LinearOpMode {
             (Instead of the circle being drawn clockwise its counterclockwise)
          */
 
-        armSubsystem.autoArmMover(1500);
+        armSubsystem.autoArmMover(4200);
+        clawSubsystem.setServoPosition(45);
+        sleep(500);
+        autoSubsystem.move(leftDrive, rightDrive, -0.5, 700);
+        autoSubsystem.move(leftDrive, rightDrive, -0.2, 900);
+        sleep(1000);
+        clawSubsystem.setServoPosition(0);
+        sleep(500);
+        autoSubsystem.move(leftDrive, rightDrive, 0.1, 200);
+        armSubsystem.autoArmMover(3700);
+        autoSubsystem.move(leftDrive, rightDrive, 0.5, 1500);
+        rotateToAngle(leftDrive, rightDrive, 90);
+        armSubsystem.autoArmMover(3400);
+        autoSubsystem.move(leftDrive, rightDrive, -0.5, 1500);
+        armSubsystem.autoArmMover(3900);
+        clawSubsystem.setServoPosition(45);
+        autoSubsystem.move(leftDrive, rightDrive, 0.3, 700);
+        rotateToAngle(leftDrive, rightDrive, -20);
+        armSubsystem.autoArmMover(0);
+        autoSubsystem.move(leftDrive, rightDrive, -1, 1500);
+
     }
 
     public void rotateToAngle(DcMotor leftDrive, DcMotor rightDrive, double targetAngle) {
-        double kP = 0.1;  // Adjusts speed
+        double kP = 0.05;  // Adjusts speed
         double kI = 0; // Don't touch it #1
         double kD = 0;  // Don't touch it #2
 
@@ -90,10 +118,19 @@ public class LeftYellowPushCompensation extends LinearOpMode {
             telemetry.addData("target angle", targetAngle);
             telemetry.addData("error", error);
 
-            if (Math.abs(error) < 1) {
-                leftDrive.setPower(0);
-                rightDrive.setPower(0);
-                break;
+            if (Math.abs(error) < 3) {
+                if (!timerStarted) {
+                    stabilityTimer.reset();
+                    timerStarted = true;
+                }
+
+                if (stabilityTimer.milliseconds() >= 200) {
+                    leftDrive.setPower(0);
+                    rightDrive.setPower(0);
+                    break;
+                }
+            } else {
+                timerStarted = false;
             }
         }
     }

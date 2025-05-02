@@ -13,7 +13,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final PIDFController armPID;
     private double armTargetPosition = 0.0;
 
-    private static final double kP = 0.008;
+    private static final double kP = 0.01;
     private static final double kI = 0;
     private static final double kD = 0;
     private static final double kF = 0;
@@ -63,10 +63,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void autoArmMover(double autoTargetArmPosition){
         setPosition(autoTargetArmPosition);
-        while (Math.abs(autoTargetArmPosition - getArmPosition()) > 25){
+        while (Math.abs(autoTargetArmPosition - getArmPosition()) > 5){
             update();
-            telemetry.addData("error", getArmError());
-            telemetry.update();
         }
         arm.set(0);
     }
