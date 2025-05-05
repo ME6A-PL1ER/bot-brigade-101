@@ -1,24 +1,22 @@
 package org.firstinspires.ftc.teamcode.Autos;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.SerialNumber;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Subsystems.AutoSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.ArmSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.AutoSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.ClawSubsystem;
 
 
-@Autonomous(name = "specimine", group = "autos")
-public class LeftYellowPushCompensation extends LinearOpMode {
+@Autonomous(name = "2 banger park", group = "autos")
+public class TwoSpeciminePark extends LinearOpMode {
     private DcMotor leftDrive;
     private DcMotor rightDrive;
     private VoltageSensor batteryVoltageSensor;
@@ -48,6 +46,8 @@ public class LeftYellowPushCompensation extends LinearOpMode {
         ArmSubsystem armSubsystem = new ArmSubsystem(hardwareMap);
         ClawSubsystem clawSubsystem = new ClawSubsystem(servo);
 
+        imu.resetYaw();
+
         telemetry.addData("Status", "Initialized. Waiting for start...");
         telemetry.update();
         waitForStart();
@@ -60,27 +60,55 @@ public class LeftYellowPushCompensation extends LinearOpMode {
             (Instead of the circle being drawn clockwise its counterclockwise)
          */
 
-        armSubsystem.autoArmMover(4200);
+        armSubsystem.autoArmMover(4220);
         clawSubsystem.setServoPosition(45);
-        sleep(500);
         autoSubsystem.move(leftDrive, rightDrive, -0.5, 700);
         autoSubsystem.move(leftDrive, rightDrive, -0.2, 900);
-        sleep(1000);
+        sleep(500);
         clawSubsystem.setServoPosition(0);
         sleep(500);
+        // Yoink first^^
         autoSubsystem.move(leftDrive, rightDrive, 0.1, 200);
         armSubsystem.autoArmMover(3700);
+        // Now off the wall
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 1500);
         rotateToAngle(leftDrive, rightDrive, 90);
+        // Ready to go forward and place
         armSubsystem.autoArmMover(3400);
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 1500);
+        autoSubsystem.move(leftDrive, rightDrive, -0.5, 1400);
         armSubsystem.autoArmMover(3900);
+        // Placed
+        clawSubsystem.setServoPosition(45);
+        autoSubsystem.move(leftDrive, rightDrive, 0.3, 500);
+        rotateToAngle(leftDrive, rightDrive, 0);
+        autoSubsystem.move(leftDrive, rightDrive, -0.8, 900);
+        rotateToAngle(leftDrive, rightDrive, -90);
+        // Looking at wall human player
+        armSubsystem.autoArmMover(4250);
+        clawSubsystem.setServoPosition(-45);
+        sleep(500);
+        autoSubsystem.move(leftDrive, rightDrive, -0.3, 1750);
+        sleep(1000);
+        clawSubsystem.setServoPosition(0);
+        sleep(750);
+        // Yoink 2nd
+        autoSubsystem.move(leftDrive, rightDrive, 0.1, 200);
+        armSubsystem.autoArmMover(3700);
+        // Off the wall
+        autoSubsystem.move(leftDrive, rightDrive, 0.3, 200);
+        rotateToAngle(leftDrive, rightDrive, 0);
+        autoSubsystem.move(leftDrive, rightDrive, 0.5, 1300);
+        rotateToAngle(leftDrive, rightDrive, 90);
+        // Ready to go forward and place
+        armSubsystem.autoArmMover(3400);
+        autoSubsystem.move(leftDrive, rightDrive, -0.5, 750);
+        armSubsystem.autoArmMover(3900);
+        // Placed
         clawSubsystem.setServoPosition(45);
         autoSubsystem.move(leftDrive, rightDrive, 0.3, 700);
-        rotateToAngle(leftDrive, rightDrive, -20);
+        rotateToAngle(leftDrive, rightDrive, -10);
         armSubsystem.autoArmMover(0);
-        autoSubsystem.move(leftDrive, rightDrive, -1, 1500);
-
+        autoSubsystem.move(leftDrive, rightDrive, -1, 1000);
     }
 
     public void rotateToAngle(DcMotor leftDrive, DcMotor rightDrive, double targetAngle) {
