@@ -60,7 +60,7 @@ public class TwoSpeciminePark extends LinearOpMode {
             (Instead of the circle being drawn clockwise its counterclockwise)
          */
 
-        armSubsystem.autoArmMover(4220);
+        armSubsystem.autoArmMover(4200);
         clawSubsystem.setServoPosition(45);
         autoSubsystem.move(leftDrive, rightDrive, -0.5, 700);
         autoSubsystem.move(leftDrive, rightDrive, -0.2, 900);
@@ -75,33 +75,33 @@ public class TwoSpeciminePark extends LinearOpMode {
         rotateToAngle(leftDrive, rightDrive, 90);
         // Ready to go forward and place
         armSubsystem.autoArmMover(3400);
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 1400);
+        autoSubsystem.move(leftDrive, rightDrive, -0.5, 1250);
         armSubsystem.autoArmMover(3900);
         // Placed
         clawSubsystem.setServoPosition(45);
-        autoSubsystem.move(leftDrive, rightDrive, 0.3, 500);
+        autoSubsystem.move(leftDrive, rightDrive, 0.2, 300);
         rotateToAngle(leftDrive, rightDrive, 0);
         autoSubsystem.move(leftDrive, rightDrive, -0.8, 900);
         rotateToAngle(leftDrive, rightDrive, -90);
         // Looking at wall human player
-        armSubsystem.autoArmMover(4250);
-        clawSubsystem.setServoPosition(-45);
-        sleep(500);
+        armSubsystem.autoArmMover(4200);
+        sleep(250);
         autoSubsystem.move(leftDrive, rightDrive, -0.3, 1750);
-        sleep(1000);
+        sleep(500);
         clawSubsystem.setServoPosition(0);
-        sleep(750);
+        sleep(250);
         // Yoink 2nd
         autoSubsystem.move(leftDrive, rightDrive, 0.1, 200);
-        armSubsystem.autoArmMover(3700);
+        armSubsystem.autoArmMover(3000);
         // Off the wall
         autoSubsystem.move(leftDrive, rightDrive, 0.3, 200);
         rotateToAngle(leftDrive, rightDrive, 0);
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 1300);
         rotateToAngle(leftDrive, rightDrive, 90);
         // Ready to go forward and place
-        armSubsystem.autoArmMover(3400);
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 750);
+        armSubsystem.autoArmMover(3300);
+        sleep(500);
+        autoSubsystem.move(leftDrive, rightDrive, -0.3, 750);
         armSubsystem.autoArmMover(3900);
         // Placed
         clawSubsystem.setServoPosition(45);
