@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Autos;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -33,6 +34,7 @@ public class TwoSpeciminePark extends LinearOpMode {
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         Servo servo = hardwareMap.get(Servo.class, "servo");
+        final CRServo intake = hardwareMap.get(CRServo.class, "intake");
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -44,7 +46,7 @@ public class TwoSpeciminePark extends LinearOpMode {
 
         AutoSubsystem autoSubsystem = new AutoSubsystem(hardwareMap);
         ArmSubsystem armSubsystem = new ArmSubsystem(hardwareMap);
-        ClawSubsystem clawSubsystem = new ClawSubsystem(servo);
+        ClawSubsystem clawSubsystem = new ClawSubsystem(servo, intake);
 
         imu.resetYaw();
 
@@ -61,11 +63,11 @@ public class TwoSpeciminePark extends LinearOpMode {
          */
 
         armSubsystem.autoArmMover(4200);
-        clawSubsystem.setServoPosition(45);
+        clawSubsystem.setMainServoPosition(45);
         autoSubsystem.move(leftDrive, rightDrive, -0.5, 700);
         autoSubsystem.move(leftDrive, rightDrive, -0.2, 900);
         sleep(500);
-        clawSubsystem.setServoPosition(0);
+        clawSubsystem.setMainServoPosition(0);
         sleep(500);
         // Yoink first^^
         autoSubsystem.move(leftDrive, rightDrive, 0.1, 200);
@@ -78,7 +80,7 @@ public class TwoSpeciminePark extends LinearOpMode {
         autoSubsystem.move(leftDrive, rightDrive, -0.5, 1250);
         armSubsystem.autoArmMover(3900);
         // Placed
-        clawSubsystem.setServoPosition(45);
+        clawSubsystem.setMainServoPosition(45);
         autoSubsystem.move(leftDrive, rightDrive, 0.2, 300);
         rotateToAngle(leftDrive, rightDrive, 0);
         autoSubsystem.move(leftDrive, rightDrive, -0.8, 900);
@@ -88,7 +90,7 @@ public class TwoSpeciminePark extends LinearOpMode {
         sleep(250);
         autoSubsystem.move(leftDrive, rightDrive, -0.3, 1750);
         sleep(500);
-        clawSubsystem.setServoPosition(0);
+        clawSubsystem.setMainServoPosition(0);
         sleep(250);
         // Yoink 2nd
         autoSubsystem.move(leftDrive, rightDrive, 0.1, 200);
@@ -104,7 +106,7 @@ public class TwoSpeciminePark extends LinearOpMode {
         autoSubsystem.move(leftDrive, rightDrive, -0.3, 750);
         armSubsystem.autoArmMover(3900);
         // Placed
-        clawSubsystem.setServoPosition(45);
+        clawSubsystem.setMainServoPosition(45);
         autoSubsystem.move(leftDrive, rightDrive, 0.3, 700);
         rotateToAngle(leftDrive, rightDrive, -10);
         armSubsystem.autoArmMover(0);
