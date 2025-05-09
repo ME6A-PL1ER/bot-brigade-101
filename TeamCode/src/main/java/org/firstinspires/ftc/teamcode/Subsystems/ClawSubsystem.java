@@ -6,11 +6,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class ClawSubsystem extends SubsystemBase {
     private final Servo servo;
-    private final CRServo subServo;
 
-    public ClawSubsystem(Servo servo, CRServo subServo) {
+    public ClawSubsystem(Servo servo) {
         this.servo = servo;
-        this.subServo = subServo;
     }
 
 
@@ -21,8 +19,4 @@ public class ClawSubsystem extends SubsystemBase {
 
         servo.setPosition(mappedPosition);
     }
-
-    public void setSubServoPosition(double subPosition) {
-    }
-
 }

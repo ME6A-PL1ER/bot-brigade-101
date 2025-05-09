@@ -15,6 +15,9 @@ import org.firstinspires.ftc.teamcode.Subsystems.AmpMonitor;
 public class MainDrive extends LinearOpMode {
 
     boolean climbing = false;
+    private int presetCycle;
+    private int lastPresetCycle;
+    double intakePower;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -22,7 +25,7 @@ public class MainDrive extends LinearOpMode {
         DcMotor rightDrive = hardwareMap.dcMotor.get("rightDrive");
         final DcMotorEx arm = hardwareMap.get(DcMotorEx.class, "arm");
         Servo servo = hardwareMap.get(Servo.class, "servo");
-        final CRServo intake = hardwareMap.get(CRServo.class, "intake");
+        CRServo intake = hardwareMap.get(CRServo.class, "intake");
 
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -32,7 +35,7 @@ public class MainDrive extends LinearOpMode {
         telemetry.update();
 
         AmpMonitor ampMonitor = new AmpMonitor(arm);
-        ClawSubsystem clawSubsystem = new ClawSubsystem(servo, intake);
+        ClawSubsystem clawSubsystem = new ClawSubsystem(servo);
 
 
         clawSubsystem.setMainServoPosition(0);
@@ -42,19 +45,33 @@ public class MainDrive extends LinearOpMode {
 
             double forward = -gamepad1.left_stick_y;
             double turn = gamepad1.right_stick_x;
-            double aF = gamepad1.right_trigger;
-            double aR = gamepad1.left_trigger * -1;
+            double aF = gamepad1.right_trigger * 0.75;
+            double aR = gamepad1.left_trigger * -0.75;
 
-            if (gamepad1.a) {clawSubsystem.setMainServoPosition(45);}
-            if (gamepad1.x) {clawSubsystem.setMainServoPosition(0);}
+            if (presetCycle != lastPresetCycle) {
+                switch (presetCycle) {
+                    case 1:
+                        clawSubsystem.setMainServoPosition(0);
+                        break;
+                    case 2:
+                        clawSubsystem.setMainServoPosition(45);
+                        break;
+                    default:
+                        telemetry.addData("preset", "none selected");
+                        telemetry.update();
+                        break;
+                }
+                lastPresetCycle = presetCycle;
+            }
 
             if (gamepad1.left_bumper) {climbing = false;}
             if (gamepad1.right_bumper) {climbing = true;}
 
-            if (gamepad1.dpad_up) {aF = 0.2;}
-            if (gamepad1.dpad_down) {aR = -0.2;}
             if (gamepad1.dpad_left) {turn = -0.2;}
             if (gamepad1.dpad_right) {turn = 0.2;}
+
+            if (gamepad1.y) {intakePower = 1.0;}
+            if (gamepad1.b) {intakePower = -1.0;}
 
             double leftPower = turn + forward;
             double rightPower = turn - forward;
@@ -62,6 +79,8 @@ public class MainDrive extends LinearOpMode {
 
             if (climbing) {arm.setPower(-1);}
             else {arm.setPower(armPower);}
+
+            intake.setPower(intakePower);
             leftDrive.setPower(leftPower);
             rightDrive.setPower(rightPower);
 

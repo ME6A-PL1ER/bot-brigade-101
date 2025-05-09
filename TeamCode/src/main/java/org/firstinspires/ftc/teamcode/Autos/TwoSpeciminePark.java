@@ -46,7 +46,7 @@ public class TwoSpeciminePark extends LinearOpMode {
 
         AutoSubsystem autoSubsystem = new AutoSubsystem(hardwareMap);
         ArmSubsystem armSubsystem = new ArmSubsystem(hardwareMap);
-        ClawSubsystem clawSubsystem = new ClawSubsystem(servo, intake);
+        ClawSubsystem clawSubsystem = new ClawSubsystem(servo);
 
         imu.resetYaw();
 
