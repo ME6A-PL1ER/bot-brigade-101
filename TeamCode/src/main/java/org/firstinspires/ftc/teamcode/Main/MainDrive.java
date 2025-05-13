@@ -1,5 +1,14 @@
 package org.firstinspires.ftc.teamcode.Main;
 
+import com.arcrobotics.ftclib.command.Command;
+import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.RunCommand;
+import com.arcrobotics.ftclib.command.WaitCommand;
+
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -8,7 +17,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Subsystems.ClawSubsystem;
-
+import org.firstinspires.ftc.teamcode.Subsystems.SubArmSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.AmpMonitor;
 
 @TeleOp(name = "ඞ pick this one ඞ", group = "Drive")
@@ -17,6 +26,8 @@ public class MainDrive extends LinearOpMode {
     boolean climbing = false;
     private int presetCycle;
     private int lastPresetCycle;
+    private int subPresetCycle;
+    private int subLastPresetCycle;
     double intakePower;
 
     @Override
@@ -24,6 +35,7 @@ public class MainDrive extends LinearOpMode {
         DcMotor leftDrive = hardwareMap.dcMotor.get("leftDrive");
         DcMotor rightDrive = hardwareMap.dcMotor.get("rightDrive");
         final DcMotorEx arm = hardwareMap.get(DcMotorEx.class, "arm");
+        final DcMotorEx subArm = hardwareMap.get(DcMotorEx.class, "subArm");
         Servo servo = hardwareMap.get(Servo.class, "servo");
         CRServo intake = hardwareMap.get(CRServo.class, "intake");
 
@@ -36,7 +48,7 @@ public class MainDrive extends LinearOpMode {
 
         AmpMonitor ampMonitor = new AmpMonitor(arm);
         ClawSubsystem clawSubsystem = new ClawSubsystem(servo);
-
+        SubArmSubsystem subArmSubsystem = new SubArmSubsystem(hardwareMap);
 
         clawSubsystem.setMainServoPosition(0);
         waitForStart();
@@ -57,11 +69,32 @@ public class MainDrive extends LinearOpMode {
                         clawSubsystem.setMainServoPosition(45);
                         break;
                     default:
-                        telemetry.addData("preset", "none selected");
-                        telemetry.update();
                         break;
                 }
                 lastPresetCycle = presetCycle;
+            }
+
+            if (subPresetCycle != subLastPresetCycle) {
+                switch (subPresetCycle) {
+                    case 1:
+                        subArmSubsystem.setPosition(-500);
+                        break;
+                    case 2:
+                        subArmSubsystem.setPosition(1000);
+                        break;
+                    default:
+                        break;
+                }
+                subLastPresetCycle = subPresetCycle;
+            }
+
+            if (gamepad1.right_bumper) {
+                new InstantCommand(() -> {
+                    intake.setPower(1);
+                    subArmSubsystem.setPosition(1200);
+                    subArmSubsystem.setPosition(700);
+                    intake.setPower(0.2);
+                });
             }
 
             if (gamepad1.left_bumper) {climbing = false;}
@@ -69,9 +102,6 @@ public class MainDrive extends LinearOpMode {
 
             if (gamepad1.dpad_left) {turn = -0.2;}
             if (gamepad1.dpad_right) {turn = 0.2;}
-
-            if (gamepad1.y) {intakePower = 1.0;}
-            if (gamepad1.b) {intakePower = -1.0;}
 
             double leftPower = turn + forward;
             double rightPower = turn - forward;

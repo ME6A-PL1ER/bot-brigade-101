@@ -21,7 +21,7 @@ public class SubArmSubsystem extends SubsystemBase {
 
 
     public SubArmSubsystem(HardwareMap hardwareMap) {
-        subArm = new MotorEx(hardwareMap, "arm");
+        subArm = new MotorEx(hardwareMap, "subArm");
         subArm.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         subArmPID = new PIDFController(kP, kI, kD, kF);
     }
