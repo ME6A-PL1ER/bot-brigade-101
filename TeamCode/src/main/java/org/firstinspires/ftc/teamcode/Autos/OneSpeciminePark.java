@@ -49,6 +49,7 @@ public class OneSpeciminePark extends LinearOpMode {
         ClawSubsystem clawSubsystem = new ClawSubsystem(servo);
 
         imu.resetYaw();
+        armSubsystem.resetZero();
 
         telemetry.addData("Status", "Initialized. Waiting for start...");
         telemetry.update();

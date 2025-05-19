@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Autos;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -16,8 +15,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.AutoSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.ClawSubsystem;
 
 
-@Autonomous(name = "2 banger park", group = "autos")
-public class TwoSpeciminePark extends LinearOpMode {
+@Autonomous(name = "2 banger push", group = "autos")
+public class TwoSpeciminePush extends LinearOpMode {
     private DcMotor leftDrive;
     private DcMotor rightDrive;
     private VoltageSensor batteryVoltageSensor;
@@ -95,7 +94,7 @@ public class TwoSpeciminePark extends LinearOpMode {
         // Looking at wall human player
         armSubsystem.autoArmMover(4200);
         sleep(250);
-        autoSubsystem.move(leftDrive, rightDrive, -0.3, 1750);
+        autoSubsystem.move(leftDrive, rightDrive, -0.3, 1250);
         sleep(500);
         clawSubsystem.setMainServoPosition(0);
         sleep(250);
@@ -109,22 +108,26 @@ public class TwoSpeciminePark extends LinearOpMode {
         rotateToAngle(leftDrive, rightDrive, 90);
         // Ready to go forward and place
         armSubsystem.autoArmMover(3250);
-        sleep(500);
-        autoSubsystem.move(leftDrive, rightDrive, -0.3, 1000);
+        sleep(250);
+        autoSubsystem.move(leftDrive, rightDrive, -0.5, 1000);
         clawSubsystem.setMainServoPosition(9);
         armSubsystem.autoArmMover(3900);
         // Placed
         clawSubsystem.setMainServoPosition(45);
         autoSubsystem.move(leftDrive, rightDrive, 0.3, 700);
-        rotateToAngle(leftDrive, rightDrive, -10);
+        rotateToAngle(leftDrive, rightDrive, 0);
         armSubsystem.autoArmMover(0);
+        autoSubsystem.move(leftDrive, rightDrive, -1, 500);
+        rotateToAngle(leftDrive, rightDrive, 45);
+        autoSubsystem.move(leftDrive, rightDrive, -0.5, 500);
+        rotateToAngle(leftDrive, rightDrive, -90);
         autoSubsystem.move(leftDrive, rightDrive, -1, 1000);
     }
 
     public void rotateToAngle(DcMotor leftDrive, DcMotor rightDrive, double targetAngle) {
-        double kP = 0.05;  // Adjusts speed
+        double kP = 0.075;  // Adjusts speed
         double kI = 0; // Don't touch it #1
-        double kD = 0;  // Don't touch it #2
+        double kD = 0.1;  // Don't touch it #2
 
         double error;
         double lastError = 0;

@@ -63,7 +63,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void autoArmMover(double autoTargetArmPosition){
         setPosition(autoTargetArmPosition);
-        while (Math.abs(autoTargetArmPosition - getArmPosition()) > 5){
+        while (Math.abs(autoTargetArmPosition - getArmPosition()) > 1){
             update();
         }
         arm.set(0);
