@@ -54,45 +54,33 @@ public class TwoSpeciminePush extends LinearOpMode {
         waitForStart();
         if (isStopRequested()) return;
 
-        /*
-            Bot should be started with omni wheels facing forward and the left wheels on the seam of
-            the basket tile and the adjacent one to the right
-            The degrees might be reversed so what we think would be 90 degrees is really -90
-            (Instead of the circle being drawn clockwise its counterclockwise)
-         */
-
-
-        telemetry.addData("arm pos", armSubsystem.getArmPosition());
-        telemetry.update();
-        armSubsystem.autoArmMover(4200);
-        telemetry.addData("arm pos after 4200", armSubsystem.getArmPosition());
-        telemetry.update();
+        armSubsystem.autoArmMover(4275);
         clawSubsystem.setMainServoPosition(45);
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 700);
+        autoSubsystem.move(leftDrive, rightDrive, -0.6, 700);
         autoSubsystem.move(leftDrive, rightDrive, -0.2, 900);
         sleep(500);
         clawSubsystem.setMainServoPosition(0);
-        telemetry.addData("claw shenannigans", armSubsystem.getArmPosition());
-        telemetry.update();
         sleep(500);
         // Yoink first^^
         autoSubsystem.move(leftDrive, rightDrive, 0.1, 200);
         armSubsystem.autoArmMover(3700);
         // Now off the wall
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 1500);
+        autoSubsystem.move(leftDrive, rightDrive, 0.8, 700);
         rotateToAngle(leftDrive, rightDrive, 90);
         // Ready to go forward and place
-        armSubsystem.autoArmMover(3375);
+        armSubsystem.autoArmMover(3300);
         autoSubsystem.move(leftDrive, rightDrive, -0.5, 1250);
+        clawSubsystem.setMainServoPosition(6);
         armSubsystem.autoArmMover(3800);
         // Placed
+        sleep(200);
         clawSubsystem.setMainServoPosition(45);
         autoSubsystem.move(leftDrive, rightDrive, 0.2, 400);
         rotateToAngle(leftDrive, rightDrive, 0);
-        autoSubsystem.move(leftDrive, rightDrive, -0.8, 900);
+        autoSubsystem.move(leftDrive, rightDrive, -0.8, 800);
         rotateToAngle(leftDrive, rightDrive, -90);
         // Looking at wall human player
-        armSubsystem.autoArmMover(4200);
+        armSubsystem.autoArmMover(4275);
         sleep(250);
         autoSubsystem.move(leftDrive, rightDrive, -0.3, 1250);
         sleep(500);
@@ -104,30 +92,31 @@ public class TwoSpeciminePush extends LinearOpMode {
         // Off the wall
         autoSubsystem.move(leftDrive, rightDrive, 0.3, 200);
         rotateToAngle(leftDrive, rightDrive, 0);
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 1300);
+        autoSubsystem.move(leftDrive, rightDrive, 0.7, 900);
         rotateToAngle(leftDrive, rightDrive, 90);
         // Ready to go forward and place
-        armSubsystem.autoArmMover(3250);
+        armSubsystem.autoArmMover(3300);
         sleep(250);
         autoSubsystem.move(leftDrive, rightDrive, -0.5, 1000);
-        clawSubsystem.setMainServoPosition(9);
+        clawSubsystem.setMainServoPosition(6);
         armSubsystem.autoArmMover(3900);
         // Placed
         clawSubsystem.setMainServoPosition(45);
         autoSubsystem.move(leftDrive, rightDrive, 0.3, 700);
-        rotateToAngle(leftDrive, rightDrive, 0);
+        rotateToAngle(leftDrive, rightDrive, 180);
         armSubsystem.autoArmMover(0);
-        autoSubsystem.move(leftDrive, rightDrive, -1, 500);
-        rotateToAngle(leftDrive, rightDrive, 45);
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 500);
+        autoSubsystem.move(leftDrive, rightDrive, 1, 500);
         rotateToAngle(leftDrive, rightDrive, -90);
-        autoSubsystem.move(leftDrive, rightDrive, -1, 1000);
+        autoSubsystem.move(leftDrive, rightDrive, 0.5, 500);
+        rotateToAngle(leftDrive, rightDrive, 80);
+        rotateToAngle(leftDrive, rightDrive, 95);
+        autoSubsystem.move(leftDrive, rightDrive, 1, 1000);
     }
 
     public void rotateToAngle(DcMotor leftDrive, DcMotor rightDrive, double targetAngle) {
-        double kP = 0.075;  // Adjusts speed
+        double kP = 0.07;  // Adjusts speed
         double kI = 0; // Don't touch it #1
-        double kD = 0.1;  // Don't touch it #2
+        double kD = 0.06;  // Don't touch it #2
 
         double error;
         double lastError = 0;

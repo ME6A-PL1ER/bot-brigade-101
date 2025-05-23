@@ -13,9 +13,9 @@ public class ArmSubsystem extends SubsystemBase {
     private final PIDFController armPID;
     private double armTargetPosition = 0.0;
 
-    private static final double kP = 0.01;
+    private static final double kP = 0.015;
     private static final double kI = 0;
-    private static final double kD = 0;
+    private static final double kD = 0.0005;
     private static final double kF = 0;
     private static final double kG = 0;
 
@@ -61,13 +61,42 @@ public class ArmSubsystem extends SubsystemBase {
         return Math.abs(getArmTargetPosition()) - Math.abs(getArmPosition());
     }
 
-    public void autoArmMover(double autoTargetArmPosition){
+    public void autoArmMover(double autoTargetArmPosition) {
         setPosition(autoTargetArmPosition);
-        while (Math.abs(autoTargetArmPosition - getArmPosition()) > 1){
+
+        final long STUCK_TIMEOUT_MS = 1000;
+        final double MOVEMENT_THRESHOLD = 0.5;
+        final double POSITION_TOLERANCE = 2;
+
+        long stuckStartTime = 0;
+        double lastPosition = getArmPosition();
+
+        while (Math.abs(autoTargetArmPosition - getArmPosition()) > POSITION_TOLERANCE) {
             update();
+
+            double currentPosition = getArmPosition();
+            double power = getArmPower();
+
+            boolean isMoving = Math.abs(currentPosition - lastPosition) > MOVEMENT_THRESHOLD;
+
+            if (power != 0 && !isMoving) {
+                if (stuckStartTime == 0) {
+                    stuckStartTime = System.currentTimeMillis();
+                } else if (System.currentTimeMillis() - stuckStartTime > STUCK_TIMEOUT_MS) {
+                    break; // Exit loop if stuck for too long
+                }
+            } else {
+                stuckStartTime = 0; // Reset timer if moving again
+            }
+
+            lastPosition = currentPosition;
         }
-        arm.set(0);
+
+        arm.set(0); // Stop the arm
     }
+
+
+
 
     public void setArmPower(double power) {
         arm.set(power);
