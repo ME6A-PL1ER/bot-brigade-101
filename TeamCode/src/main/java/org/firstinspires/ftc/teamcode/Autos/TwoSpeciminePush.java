@@ -104,9 +104,9 @@ public class TwoSpeciminePush extends LinearOpMode {
         clawSubsystem.setMainServoPosition(45);
         autoSubsystem.move(leftDrive, rightDrive, 0.3, 700);
         rotateToAngle(leftDrive, rightDrive, 180);
-        armSubsystem.autoArmMover(0);
         autoSubsystem.move(leftDrive, rightDrive, 1, 500);
         rotateToAngle(leftDrive, rightDrive, -90);
+        armSubsystem.autoArmMover(2000);
         autoSubsystem.move(leftDrive, rightDrive, 0.5, 500);
         rotateToAngle(leftDrive, rightDrive, 80);
         rotateToAngle(leftDrive, rightDrive, 95);
