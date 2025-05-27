@@ -15,9 +15,16 @@ import org.firstinspires.ftc.teamcode.Subsystems.ClawSubsystem;
 
 @TeleOp(name = "turning pid tune", group = "Drive")
 public class PidTune extends LinearOpMode {
-    private double kP = 0.07;
+    private double kP = 0.11;
     private double kI = 0;
-    private double kD = 0.06;
+    private double kD = 1;
+
+    boolean prevDpadUp = false;
+    boolean prevDpadDown = false;
+    boolean prevDpadRight = false;
+    boolean prevDpadLeft = false;
+    boolean prevY = false;
+    boolean prevA = false;
 
     private IMU imu;
 
@@ -42,12 +49,38 @@ public class PidTune extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            if (gamepad1.dpad_up) {kP += 0.005;}
-            if (gamepad1.dpad_down) {kP -= 0.005;}
-            if (gamepad1.dpad_right) {kI += 0.005;}
-            if (gamepad1.dpad_left) {kI -= 0.005;}
-            if (gamepad1.y) {kD += 0.005;}
-            if (gamepad1.a) {kD -= 0.005;}
+            if (gamepad1.dpad_up && !prevDpadUp) {
+                kP += 0.005;
+            }
+            prevDpadUp = gamepad1.dpad_up;
+
+            if (gamepad1.dpad_down && !prevDpadDown) {
+                kP -= 0.005;
+            }
+            prevDpadDown = gamepad1.dpad_down;
+
+            if (gamepad1.dpad_right && !prevDpadRight) {
+                kI += 0.005;
+            }
+            prevDpadRight = gamepad1.dpad_right;
+
+            if (gamepad1.dpad_left && !prevDpadLeft) {
+                kI -= 0.005;
+            }
+            prevDpadLeft = gamepad1.dpad_left;
+
+            if (gamepad1.y && !prevY) {
+                kD += 0.005;
+            }
+            prevY = gamepad1.y;
+
+            if (gamepad1.a && !prevA) {
+                kD -= 0.005;
+            }
+            prevA = gamepad1.a;
+
+            if (gamepad1.left_bumper) {rotateToAngle(leftDrive, rightDrive, 90);}
+            if (gamepad1.right_bumper) {rotateToAngle(leftDrive, rightDrive, -90);}
 
             telemetry.addData("P value:", kP);
             telemetry.addData("I value:", kI);

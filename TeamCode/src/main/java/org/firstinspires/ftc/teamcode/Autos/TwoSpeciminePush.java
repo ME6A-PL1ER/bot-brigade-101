@@ -114,9 +114,9 @@ public class TwoSpeciminePush extends LinearOpMode {
     }
 
     public void rotateToAngle(DcMotor leftDrive, DcMotor rightDrive, double targetAngle) {
-        double kP = 0.07;  // Adjusts speed
-        double kI = 0; // Don't touch it #1
-        double kD = 0.06;  // Don't touch it #2
+        double kP = 0.11;  // Adjusts speed
+        double kI = 0; // Don't touch it
+        double kD = 1;  // Don't overcompensate
 
         double error;
         double lastError = 0;
