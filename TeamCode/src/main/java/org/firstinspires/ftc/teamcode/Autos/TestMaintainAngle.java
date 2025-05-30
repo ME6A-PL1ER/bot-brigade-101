@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.AutoSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.ClawSubsystem;
 
 
-@Autonomous(name = "2 banger push 12.9 volts", group = "autos")
-public class TwoSpeciminePush129 extends LinearOpMode {
+@Autonomous(name = "test angle management", group = "autos")
+public class TestMaintainAngle extends LinearOpMode {
     private DcMotor leftDrive;
     private DcMotor rightDrive;
     private VoltageSensor batteryVoltageSensor;
@@ -54,75 +54,13 @@ public class TwoSpeciminePush129 extends LinearOpMode {
         waitForStart();
         if (isStopRequested()) return;
 
-        /*
-            Bot should be started with omni wheels facing forward and the left wheels on the seam of
-            the basket tile and the adjacent one to the right
-            The degrees might be reversed so what we think would be 90 degrees is really -90
-            (Instead of the circle being drawn clockwise its counterclockwise)
-         */
-
-
-        armSubsystem.autoArmMover(4275);
-        clawSubsystem.setMainServoPosition(45);
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 700);
-        autoSubsystem.move(leftDrive, rightDrive, -0.2, 900);
-        sleep(500);
-        clawSubsystem.setMainServoPosition(0);
-        sleep(500);
-        // Yoink first^^
-        autoSubsystem.move(leftDrive, rightDrive, 0.1, 200);
-        armSubsystem.autoArmMover(3700);
-        // Now off the wall
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 1500);
-        rotateToAngle(leftDrive, rightDrive, 90);
-        // Ready to go forward and place
-        armSubsystem.autoArmMover(3325);
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 1250);
-        armSubsystem.autoArmMover(3800);
-        // Placed
-        clawSubsystem.setMainServoPosition(45);
-        autoSubsystem.move(leftDrive, rightDrive, 0.2, 400);
-        rotateToAngle(leftDrive, rightDrive, 0);
-        autoSubsystem.move(leftDrive, rightDrive, -0.8, 800);
-        rotateToAngle(leftDrive, rightDrive, -90);
-        // Looking at wall human player
-        armSubsystem.autoArmMover(4275);
-        sleep(250);
-        autoSubsystem.move(leftDrive, rightDrive, -0.3, 1250);
-        sleep(500);
-        clawSubsystem.setMainServoPosition(0);
-        sleep(250);
-        // Yoink 2nd
-        autoSubsystem.move(leftDrive, rightDrive, 0.1, 200);
-        armSubsystem.autoArmMover(3000);
-        // Off the wall
-        autoSubsystem.move(leftDrive, rightDrive, 0.3, 200);
-        rotateToAngle(leftDrive, rightDrive, 0);
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 1300);
-        rotateToAngle(leftDrive, rightDrive, 90);
-        // Ready to go forward and place
-        armSubsystem.autoArmMover(3290);
-        sleep(250);
-        autoSubsystem.move(leftDrive, rightDrive, -0.5, 1000);
-        clawSubsystem.setMainServoPosition(9);
-        armSubsystem.autoArmMover(3900);
-        // Placed
-        clawSubsystem.setMainServoPosition(45);
-        autoSubsystem.move(leftDrive, rightDrive, 0.3, 700);
-        rotateToAngle(leftDrive, rightDrive, 180);
-        armSubsystem.autoArmMover(0);
-        autoSubsystem.move(leftDrive, rightDrive, 1, 500);
-        rotateToAngle(leftDrive, rightDrive, -90);
-        autoSubsystem.move(leftDrive, rightDrive, 0.5, 500);
-        rotateToAngle(leftDrive, rightDrive, 80);
-        rotateToAngle(leftDrive, rightDrive, 95);
-        autoSubsystem.move(leftDrive, rightDrive, 1, 1000);
+        moveMaintainAngle(leftDrive, rightDrive, 0.5, 5000);
     }
 
     public void rotateToAngle(DcMotor leftDrive, DcMotor rightDrive, double targetAngle) {
-        double kP = 0.075;  // Adjusts speed
-        double kI = 0; // Don't touch it #1
-        double kD = 0.2;  // Don't touch it #2
+        double kP = 0.11;  // Adjusts speed
+        double kI = 0; // Don't touch it
+        double kD = 1;  // Don't overcompensate
 
         double error;
         double lastError = 0;
@@ -169,5 +107,53 @@ public class TwoSpeciminePush129 extends LinearOpMode {
                 timerStarted = false;
             }
         }
+    }
+
+    public void moveMaintainAngle(DcMotor leftDrive, DcMotor rightDrive, double power, int durationMillis) {
+        double kP = 0.05;
+        double kI = 0;
+        double kD = 0.01;
+
+        double initialAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+
+        double error;
+        double lastError = 0;
+        double integral = 0;
+        double derivative;
+        double correction;
+
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + durationMillis;
+
+        while (System.currentTimeMillis() < endTime && opModeIsActive()) {
+            double currentAngle = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+
+            error = initialAngle - currentAngle;
+            if (error > 180) error -= 360;
+            if (error < -180) error += 360;
+
+            integral += error;
+            derivative = error - lastError;
+            lastError = error;
+
+            correction = (kP * error) + (kI * integral) + (kD * derivative);
+
+            double batteryVoltage = batteryVoltageSensor.getVoltage();
+            double compensationFactor = 12.0 / batteryVoltage;
+            double compensatedPower = power * compensationFactor;
+            compensatedPower = Math.max(-1.0, Math.min(1.0, compensatedPower));
+
+            double leftPower = -compensatedPower - correction;
+            double rightPower = compensatedPower - correction;
+
+            leftPower = Math.max(-1.0, Math.min(1.0, leftPower));
+            rightPower = Math.max(-1.0, Math.min(1.0, rightPower));
+
+            leftDrive.setPower(leftPower);
+            rightDrive.setPower(rightPower);
+        }
+
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
     }
 }
